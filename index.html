@@ -1,17 +1,132 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f6f8fb" />
-    <meta name="description" content="Kalkulaku membantu Anda menghitung estimasi angsuran bulanan, DP, bunga KPR/kendaraan, dan analisis kesehatan finansial secara akurat tanpa ribet." />
-    <title>Kalkulaku | Hitung Simulasi Kredit Motor, Mobil & KPR Online</title>
-    <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f6f8fb" />
+
+  <!-- Title & description: unik, sesuai isi halaman -->
+  <title>Kalkulator Kredit: Simulasi Cicilan Motor, Mobil, KPR | Kalkulaku</title>
+  <meta name="description" content="Hitung simulasi cicilan kredit motor, mobil, KPR, dan pinjaman tunai. Bandingkan bunga flat dan efektif, gratis, akurat, dan tanpa daftar." />
+  <link rel="canonical" href="https://kalkulaku.id/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Kalkulaku" />
+
+  <!-- Verifikasi Google Search Console (isi lalu hapus tanda komentar) -->
+  <!-- <meta name="google-site-verification" content="KODE_DARI_SEARCH_CONSOLE" /> -->
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Kalkulaku" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:url" content="https://kalkulaku.id/" />
+  <meta property="og:title" content="Kalkulaku: Kalkulator & Simulasi Kredit" />
+  <meta property="og:description" content="Hitung cicilan kredit motor, mobil, KPR, dan pinjaman dengan bunga flat atau efektif. Gratis dan akurat." />
+  <meta property="og:image" content="https://kalkulaku.id/thumbnail.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Kalkulaku, kalkulator dan simulasi kredit" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Kalkulaku: Kalkulator & Simulasi Kredit" />
+  <meta name="twitter:description" content="Hitung cicilan kredit motor, mobil, KPR, dan pinjaman dengan bunga flat atau efektif." />
+  <meta name="twitter:image" content="https://kalkulaku.id/thumbnail.jpg" />
+
+  <!-- Icon: pakai path absolut agar tidak rusak di halaman bersarang -->
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://kalkulaku.id/#website",
+        "url": "https://kalkulaku.id/",
+        "name": "Kalkulaku",
+        "inLanguage": "id-ID"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://kalkulaku.id/#app",
+        "name": "Kalkulaku, Kalkulator & Simulasi Kredit",
+        "url": "https://kalkulaku.id/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "id-ID",
+        "description": "Alat bantu hitung simulasi cicilan kredit motor, mobil, KPR, dan pinjaman tunai dengan bunga flat atau efektif.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Apa beda bunga flat dan bunga efektif?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bunga flat dihitung dari pokok pinjaman awal dan nilainya tetap sepanjang tenor. Bunga efektif dihitung dari sisa pokok yang terus menurun, sehingga total bunganya umumnya lebih kecil pada angka bunga nominal yang sama."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bagaimana cara menghitung cicilan kredit bunga flat?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cicilan per bulan = (pokok pinjaman + pokok × bunga per tahun × lama pinjaman dalam tahun) ÷ jumlah bulan tenor."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah hasil simulasi sama persis dengan hitungan bank atau leasing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hasil simulasi adalah perkiraan. Angka final bisa berbeda karena biaya administrasi, provisi, asuransi, dan kebijakan masing-masing lembaga pembiayaan."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Analytics (ganti G-XXXXXXXXXX dengan ID GA4 Anda lalu hapus tanda komentar) -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
+
+  <!-- Baris di bawah dibuat otomatis oleh Vite; jangan diubah manual jika memakai source index.html -->
+  <script type="module" crossorigin src="/assets/index-DN6Px8TN.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CtuUpAIe.css" />
 </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<body>
+  <div id="root">
+    <!-- Konten cadangan agar crawler dan pengguna JS-mati tetap melihat isi.
+         Akan otomatis diganti React saat aplikasi termuat. -->
+    <main>
+      <h1>Kalkulator Kredit &amp; Simulasi Cicilan</h1>
+      <p>
+        Kalkulaku membantu Anda menghitung simulasi cicilan kredit motor, mobil, KPR,
+        dan pinjaman tunai. Pilih bunga flat atau efektif, atur uang muka dan tenor,
+        lalu lihat cicilan per bulan secara cepat dan akurat. Gratis dan tanpa daftar.
+      </p>
+      <ul>
+        <li>Simulasi kredit motor</li>
+        <li>Simulasi kredit mobil</li>
+        <li>Simulasi KPR</li>
+        <li>Simulasi pinjaman tunai</li>
+        <li>Perbandingan bunga flat dan bunga efektif</li>
+      </ul>
+    </main>
+    <noscript>Aktifkan JavaScript untuk menggunakan kalkulator Kalkulaku.</noscript>
+  </div>
+</body>
 </html>
