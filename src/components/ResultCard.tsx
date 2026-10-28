@@ -12,7 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { formatRupiah } from "@/lib/format";
+import { formatNumber, formatRupiah } from "@/lib/format";
 import type { LoanResult, AmortizationRow } from "@/lib/calc";
 import type { TabConfig } from "@/lib/tabs";
 import AmortizationTable from "@/components/AmortizationTable";
@@ -20,6 +20,8 @@ import { buildCopyText, type SummaryData } from "@/lib/summary";
 import { generatePDF } from "@/lib/pdf";
 
 export type CalcMethod = "flat" | "anuitas";
+
+const fixedLabel = (months: number) => (months % 12 === 0 ? `${months / 12} tahun` : `${months} bulan`);
 
 interface ResultCardProps {
   result: LoanResult;
@@ -32,9 +34,10 @@ interface ResultCardProps {
   tenorMonths: number;
   adminFee: number;
   insuranceFee: number;
+  floatingSource?: string;
 }
 
-export default function ResultCard({ result, config, method, onToggleMethod, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee }: ResultCardProps) {
+export default function ResultCard({ result, config, method, onToggleMethod, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee, floatingSource }: ResultCardProps) {
   const [copied, setCopied] = useState(false);
   const isAnuitas = method === "anuitas";
   const primaryMonthly = isAnuitas ? result.monthlyAnnuity : result.monthlyFlat;
@@ -43,7 +46,7 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
   const schedule: AmortizationRow[] = isAnuitas ? result.scheduleAnnuity : result.scheduleFlat;
 
   const summaryData: SummaryData = {
-    config, result, method, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee,
+    config, result, method, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee, floatingSource,
   };
 
   const handleCopy = () => {
@@ -66,12 +69,15 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
           <div className="min-w-0">
             <p className="mb-1 text-sm font-medium text-white/75">Estimasi cicilan per bulan</p>
             <p className="truncate text-3xl font-bold tracking-tight sm:text-4xl">{formatRupiah(primaryMonthly)}</p>
-            <p className="mt-2 text-xs text-white/70">Metode bunga {method}</p>
+            <p className="mt-2 text-xs text-white/70">
+              {result.floating ? `Selama masa fixed (${fixedLabel(result.floating.fixedMonths)})` : `Metode bunga ${method}`}
+            </p>
           </div>
           <div className="rounded-2xl bg-white/15 p-3 backdrop-blur-sm">
             <Calculator className="h-6 w-6" />
           </div>
         </div>
+        {config.allowFlat && (
         <button
           onClick={onToggleMethod}
           className="group mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/25 active:scale-[0.99]"
@@ -79,6 +85,7 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
           <ArrowLeftRight className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
           Konversi ke {isAnuitas ? "Bunga Flat" : "Bunga Anuitas"}
         </button>
+        )}
       </div>
 
       {/* Metrics */}
@@ -87,6 +94,32 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
           <Metric icon={<ArrowDown className="h-4 w-4" />} label={config.upfrontLabel} value={formatRupiah(result.totalDownPayment)} accent={config.accentText} />
           <Metric icon={<Banknote className="h-4 w-4" />} label="Pokok Pinjaman" value={formatRupiah(result.principal)} accent={config.accentText} />
         </div>
+
+        {result.floating && (
+          <div className="px-5 py-5 sm:px-7">
+            <div className={`rounded-xl border p-4 ${config.accentBorder} ${config.accentSoft}`}>
+              <p className={`mb-3 text-sm font-bold ${config.accentSoftText}`}>Cicilan masa fixed dan floating</p>
+              <dl className="space-y-2.5 text-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Masa fixed ({fixedLabel(result.floating.fixedMonths)}, bunga {formatNumber(interestRate)}%)</dt>
+                  <dd className="shrink-0 font-bold text-slate-800">{formatRupiah(result.monthlyAnnuity)}</dd>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Setelah masa fixed (bunga floating {formatNumber(result.floating.floatingRate)}%)</dt>
+                  <dd className="shrink-0 font-bold text-slate-800">≈ {formatRupiah(result.floating.monthlyAfterFixed)}</dd>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Sisa pokok saat masa fixed berakhir</dt>
+                  <dd className="shrink-0 font-bold text-slate-800">{formatRupiah(result.floating.balanceAtSwitch)}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-xs leading-5 text-slate-500">
+                Cicilan setelah masa fixed adalah estimasi dan bisa berubah mengikuti suku bunga pasar.
+                {floatingSource ? ` Bunga floating dihitung dari: ${floatingSource}.` : ""}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4 px-5 py-4 sm:px-7">
           <div className="flex flex-col gap-0.5">
