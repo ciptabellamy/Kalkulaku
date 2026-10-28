@@ -84,7 +84,7 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
       {/* Metrics */}
       <div className="divide-y divide-slate-100">
         <div className="grid grid-cols-2 gap-4 px-5 py-5 sm:px-7">
-          <Metric icon={<ArrowDown className="h-4 w-4" />} label="Total DP + Biaya" value={formatRupiah(result.totalDownPayment)} accent={config.accentText} />
+          <Metric icon={<ArrowDown className="h-4 w-4" />} label={config.upfrontLabel} value={formatRupiah(result.totalDownPayment)} accent={config.accentText} />
           <Metric icon={<Banknote className="h-4 w-4" />} label="Pokok Pinjaman" value={formatRupiah(result.principal)} accent={config.accentText} />
         </div>
 
