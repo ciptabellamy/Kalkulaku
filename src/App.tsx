@@ -27,7 +27,7 @@ import { TAB_CONFIGS, type CreditType } from "@/lib/tabs";
 const getConfig = (id: CreditType) => TAB_CONFIGS.find((tab) => tab.id === id) ?? TAB_CONFIGS[0];
 
 function App() {
-  const [activeType, setActiveType] = useState<CreditType>("mobil");
+  const [activeType, setActiveType] = useState<CreditType>("kendaraan");
   const config = getConfig(activeType);
   const ConfigIcon = config.icon;
   const [price, setPrice] = useState(config.defaultPrice);
@@ -40,9 +40,11 @@ function App() {
   const [showFees, setShowFees] = useState(false);
   const [biRate, setBiRate] = useState<number>(6.5);
 
+  const effectiveDP = config.hasDownPayment ? downPayment : 0;
+
   const result = useMemo(
-    () => calculateLoan({ price, downPaymentPercent: downPayment, interestRate, tenorMonths, adminFee, insuranceFee }),
-    [price, downPayment, interestRate, tenorMonths, adminFee, insuranceFee],
+    () => calculateLoan({ price, downPaymentPercent: effectiveDP, interestRate, tenorMonths, adminFee, insuranceFee }),
+    [price, effectiveDP, interestRate, tenorMonths, adminFee, insuranceFee],
   );
 
   const switchType = (type: CreditType) => {
@@ -74,7 +76,7 @@ function App() {
             </div>
             <div>
               <p className="text-base font-bold tracking-tight text-slate-950 sm:text-lg">Kalku<span className="text-sky-600">laku</span></p>
-              <p className="hidden text-[11px] font-medium tracking-wide text-slate-400 sm:block">Kalkulator Simulasi Kredit Motor, Mobil & KPR Terpercaya</p>
+              <p className="hidden text-[11px] font-medium tracking-wide text-slate-400 sm:block">Kalkulator Simulasi Kredit Kendaraan, Multiguna & KPR Terpercaya</p>
             </div>
           </div>
           <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 shadow-sm sm:flex">
@@ -91,8 +93,8 @@ function App() {
         {/* Hero */}
         <div className="mb-8 mt-10 max-w-2xl sm:mb-10">
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-sky-600">Simulasi kredit online</p>
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">Kalkulaku – Kalkulator Simulasi Kredit Motor, Mobil & KPR Terpercaya</h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">Hitung estimasi angsuran bulanan, DP, bunga KPR/kendaraan, dan analisis kesehatan finansial secara akurat tanpa ribet.</p>
+          <h1 className="text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">Kalkulaku – Kalkulator Simulasi Kredit Kendaraan Bermotor, Multiguna & KPR Terpercaya</h1>
+          <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">Hitung estimasi angsuran bulanan, DP, bunga kredit kendaraan bermotor, multiguna, dan KPR, serta analisis kesehatan finansial secara akurat tanpa ribet.</p>
         </div>
 
         <TabBar active={activeType} onChange={switchType} />
@@ -121,7 +123,8 @@ function App() {
                 />
               </Field>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className={config.hasDownPayment ? "grid gap-5 sm:grid-cols-2" : "grid gap-5"}>
+                {config.hasDownPayment && (
                 <Field label="Uang muka / DP" hint="Min. 10%" suffix="%">
                   <input
                     type="number"
@@ -136,6 +139,7 @@ function App() {
                     {formatRupiah(result.downPaymentAmount)}
                   </div>
                 </Field>
+                )}
 
                 <Field label="Suku bunga per tahun" hint="Estimasi" suffix="% / thn">
                   <input
@@ -184,7 +188,7 @@ function App() {
                 </button>
                 {showFees && (
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <Field label="Biaya Admin" suffix="Rp">
+                    <Field label={config.adminFeeLabel} suffix="Rp">
                       <input
                         inputMode="numeric"
                         value={formatRupiahInput(adminFee)}
@@ -214,7 +218,7 @@ function App() {
           </section>
 
           {/* 3. Result Card */}
-          <ResultCard result={result} config={config} method={method} onToggleMethod={toggleMethod} price={price} downPaymentPercent={downPayment} interestRate={interestRate} tenorMonths={tenorMonths} adminFee={adminFee} insuranceFee={insuranceFee} />
+          <ResultCard result={result} config={config} method={method} onToggleMethod={toggleMethod} price={price} downPaymentPercent={effectiveDP} interestRate={interestRate} tenorMonths={tenorMonths} adminFee={adminFee} insuranceFee={insuranceFee} />
         </div>
 
         {/* 4. Financial Health Education Section */}
