@@ -15,8 +15,8 @@ export interface SummaryData {
 }
 
 export const SITE_NAME = "Kalkulaku";
-export const SITE_TAGLINE = "Kalkulator Simulasi Kredit Motor, Mobil & KPR Terpercaya";
-export const SITE_URL = "kalkulaku.app";
+export const SITE_TAGLINE = "Kalkulator Simulasi Kredit Kendaraan, Multiguna & KPR Terpercaya";
+export const SITE_URL = "kalkulaku.id";
 
 export const getPrimaryMonthly = (result: LoanResult, method: "flat" | "anuitas") =>
   method === "anuitas" ? result.monthlyAnnuity : result.monthlyFlat;
@@ -42,15 +42,18 @@ export const buildSummaryLines = (data: SummaryData): SummaryLine[] => {
   const primaryTotal = getPrimaryTotal(result, method);
   const totalPaymentPlusDP = primaryTotal + result.totalDownPayment;
   const totalFeesAndInsurance = adminFee + insuranceFee;
+  const hasDP = config.hasDownPayment;
 
   return [
     { label: "Jenis Kredit", value: config.label },
-    { label: "Harga", value: formatRupiah(price) },
-    { label: `Uang Muka / DP (${downPaymentPercent}%)`, value: formatRupiah(result.downPaymentAmount) },
-    { label: "Biaya Admin", value: formatRupiah(adminFee) },
+    { label: hasDP ? "Harga" : "Jumlah Pinjaman", value: formatRupiah(price) },
+    ...(hasDP
+      ? [{ label: `Uang Muka / DP (${downPaymentPercent}%)`, value: formatRupiah(result.downPaymentAmount) }]
+      : []),
+    { label: config.adminFeeLabel, value: formatRupiah(adminFee) },
     { label: "Biaya Asuransi", value: formatRupiah(insuranceFee) },
     { label: "Total Biaya & Asuransi", value: formatRupiah(totalFeesAndInsurance) },
-    { label: "Total DP + Biaya", value: formatRupiah(result.totalDownPayment) },
+    { label: config.upfrontLabel, value: formatRupiah(result.totalDownPayment) },
     { label: "Pokok Pinjaman", value: formatRupiah(result.principal) },
     { label: "Suku Bunga", value: `${interestRate}% / thn` },
     { label: "Tenor", value: `${tenorMonths} bulan (${Math.floor(tenorMonths / 12)} tahun${tenorMonths % 12 ? " " + (tenorMonths % 12) + " bulan" : ""})` },
@@ -58,7 +61,7 @@ export const buildSummaryLines = (data: SummaryData): SummaryLine[] => {
     { label: "Cicilan / Bulan", value: formatRupiah(primaryMonthly) },
     { label: "Total Bunga", value: formatRupiah(primaryInterest) },
     { label: "Total Pembayaran", value: formatRupiah(primaryTotal) },
-    { label: "Total Pembayaran + DP", value: formatRupiah(totalPaymentPlusDP) },
+    { label: hasDP ? "Total Pembayaran + DP" : "Total Pembayaran + Biaya di Muka", value: formatRupiah(totalPaymentPlusDP) },
     { label: "Min. Penghasilan Bersih", value: formatRupiah(result.minIncome) },
   ];
 };
