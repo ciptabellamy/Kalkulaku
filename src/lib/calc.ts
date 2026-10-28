@@ -5,6 +5,10 @@ export interface LoanInput {
   tenorMonths: number;
   adminFee: number;
   insuranceFee: number;
+  /** Khusus KPR: lama masa bunga fixed (bulan). Setelah itu bunga floating berlaku. */
+  fixedPeriodMonths?: number;
+  /** Khusus KPR: bunga floating per tahun (%) setelah masa fixed berakhir. */
+  floatingRate?: number;
 }
 
 export interface AmortizationRow {
@@ -13,6 +17,13 @@ export interface AmortizationRow {
   interest: number;
   principal: number;
   balance: number;
+}
+
+export interface FloatingInfo {
+  fixedMonths: number;
+  floatingRate: number;
+  monthlyAfterFixed: number;
+  balanceAtSwitch: number;
 }
 
 export interface LoanResult {
@@ -28,7 +39,16 @@ export interface LoanResult {
   scheduleFlat: AmortizationRow[];
   scheduleAnnuity: AmortizationRow[];
   minIncome: number;
+  floating: FloatingInfo | null;
 }
+
+// Anuitas: M = P * r / (1 - (1+r)^-n)
+const annuityPayment = (principal: number, monthlyRate: number, months: number): number => {
+  if (months <= 0) return 0;
+  if (monthlyRate === 0) return principal / months;
+  const factor = Math.pow(1 + monthlyRate, months);
+  return (principal * monthlyRate * factor) / (factor - 1);
+};
 
 export const calculateLoan = (input: LoanInput): LoanResult => {
   const { price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee } = input;
@@ -44,16 +64,14 @@ export const calculateLoan = (input: LoanInput): LoanResult => {
   const monthlyFlat = (principal + totalInterestFlat) / tenorMonths;
   const totalPaymentFlat = principal + totalInterestFlat;
 
-  // Anuitas: M = P * r / (1 - (1+r)^-n)
-  let monthlyAnnuity: number;
-  if (monthlyRate === 0) {
-    monthlyAnnuity = principal / tenorMonths;
-  } else {
-    const factor = Math.pow(1 + monthlyRate, tenorMonths);
-    monthlyAnnuity = (principal * monthlyRate * factor) / (factor - 1);
-  }
-  const totalPaymentAnnuity = monthlyAnnuity * tenorMonths;
-  const totalInterestAnnuity = totalPaymentAnnuity - principal;
+  // Anuitas. Cicilan awal dihitung dari seluruh tenor dengan bunga fixed.
+  const monthlyAnnuity = annuityPayment(principal, monthlyRate, tenorMonths);
+
+  // KPR: setelah masa fixed, sisa pokok dihitung ulang dengan bunga floating
+  const fixedMonths = input.fixedPeriodMonths ?? 0;
+  const hasFloating =
+    input.floatingRate !== undefined && fixedMonths > 0 && fixedMonths < tenorMonths;
+  const floatingMonthlyRate = (input.floatingRate ?? 0) / 100 / 12;
 
   // Amortization schedule - Flat
   const scheduleFlat: AmortizationRow[] = [];
@@ -71,12 +89,22 @@ export const calculateLoan = (input: LoanInput): LoanResult => {
     });
   }
 
-  // Amortization schedule - Annuity
+  // Amortization schedule - Annuity (dengan masa fixed dan floating bila ada)
   const scheduleAnnuity: AmortizationRow[] = [];
   let balanceAnnuity = principal;
+  let currentPayment = monthlyAnnuity;
+  let currentRate = monthlyRate;
+  let monthlyAfterFixed = 0;
+  let balanceAtSwitch = 0;
   for (let m = 1; m <= tenorMonths; m++) {
-    const interestPart = balanceAnnuity * monthlyRate;
-    let principalPart = monthlyAnnuity - interestPart;
+    if (hasFloating && m === fixedMonths + 1) {
+      balanceAtSwitch = balanceAnnuity;
+      currentRate = floatingMonthlyRate;
+      currentPayment = annuityPayment(balanceAnnuity, currentRate, tenorMonths - fixedMonths);
+      monthlyAfterFixed = currentPayment;
+    }
+    const interestPart = balanceAnnuity * currentRate;
+    let principalPart = currentPayment - interestPart;
     balanceAnnuity -= principalPart;
     if (m === tenorMonths) {
       principalPart += balanceAnnuity;
@@ -84,16 +112,23 @@ export const calculateLoan = (input: LoanInput): LoanResult => {
     }
     scheduleAnnuity.push({
       month: m,
-      payment: monthlyAnnuity,
+      payment: currentPayment,
       interest: interestPart,
       principal: principalPart,
       balance: Math.max(0, balanceAnnuity),
     });
   }
 
+  const totalPaymentAnnuity = hasFloating
+    ? monthlyAnnuity * fixedMonths + monthlyAfterFixed * (tenorMonths - fixedMonths)
+    : monthlyAnnuity * tenorMonths;
+  const totalInterestAnnuity = totalPaymentAnnuity - principal;
+
   // Financial health: cicilan <= 30% penghasilan bersih
-  // penghasilan minimal = cicilan / 0.3 = cicilan * 3.333...
-  const minIncome = monthlyAnnuity * (100 / 30);
+  // penghasilan minimal = cicilan / 0.3. Untuk KPR dengan masa floating,
+  // dipakai cicilan tertinggi agar perkiraan lebih aman.
+  const highestMonthly = hasFloating ? Math.max(monthlyAnnuity, monthlyAfterFixed) : monthlyAnnuity;
+  const minIncome = highestMonthly * (100 / 30);
 
   return {
     downPaymentAmount: dpAmount,
@@ -108,5 +143,13 @@ export const calculateLoan = (input: LoanInput): LoanResult => {
     scheduleFlat,
     scheduleAnnuity,
     minIncome,
+    floating: hasFloating
+      ? {
+          fixedMonths,
+          floatingRate: input.floatingRate as number,
+          monthlyAfterFixed,
+          balanceAtSwitch,
+        }
+      : null,
   };
 };
