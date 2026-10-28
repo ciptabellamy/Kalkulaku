@@ -2,10 +2,17 @@ import { Car, Wallet, Home, type LucideIcon } from "lucide-react";
 
 export type CreditType = "kendaraan" | "multiguna" | "kpr";
 
+// Asumsi spread KPR floating di atas BI-Rate (dalam persen)
+export const KPR_FLOATING_SPREAD = 6.25;
+
 export interface TabConfig {
   id: CreditType;
   label: string;
   shortLabel: string;
+  allowFlat: boolean;
+  hasFloating: boolean;
+  rateLabel: string;
+  defaultFixedYears: number;
   icon: LucideIcon;
   hasDownPayment: boolean;
   priceLabel: string;
@@ -33,6 +40,10 @@ export const TAB_CONFIGS: TabConfig[] = [
     id: "kendaraan",
     label: "Kendaraan Bermotor",
     shortLabel: "Kendaraan",
+    allowFlat: true,
+    hasFloating: false,
+    rateLabel: "Suku bunga per tahun",
+    defaultFixedYears: 0,
     icon: Car,
     hasDownPayment: true,
     priceLabel: "Harga Kendaraan",
@@ -66,6 +77,10 @@ export const TAB_CONFIGS: TabConfig[] = [
     id: "multiguna",
     label: "Kredit Multiguna",
     shortLabel: "Multiguna",
+    allowFlat: true,
+    hasFloating: false,
+    rateLabel: "Suku bunga per tahun",
+    defaultFixedYears: 0,
     icon: Wallet,
     hasDownPayment: false,
     priceLabel: "Jumlah Pinjaman",
@@ -97,6 +112,10 @@ export const TAB_CONFIGS: TabConfig[] = [
     id: "kpr",
     label: "Kredit KPR",
     shortLabel: "KPR",
+    allowFlat: false,
+    hasFloating: true,
+    rateLabel: "Bunga fixed per tahun",
+    defaultFixedYears: 3,
     icon: Home,
     hasDownPayment: true,
     priceLabel: "Harga Properti",
