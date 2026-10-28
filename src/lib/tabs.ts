@@ -1,13 +1,17 @@
-import { Car, Bike, Home, type LucideIcon } from "lucide-react";
+import { Car, Wallet, Home, type LucideIcon } from "lucide-react";
 
-export type CreditType = "mobil" | "motor" | "kpr";
+export type CreditType = "kendaraan" | "multiguna" | "kpr";
 
 export interface TabConfig {
   id: CreditType;
   label: string;
+  shortLabel: string;
   icon: LucideIcon;
+  hasDownPayment: boolean;
   priceLabel: string;
   pricePlaceholder: string;
+  adminFeeLabel: string;
+  upfrontLabel: string;
   defaultPrice: number;
   defaultDP: number;
   defaultRate: number;
@@ -26,20 +30,26 @@ export interface TabConfig {
 
 export const TAB_CONFIGS: TabConfig[] = [
   {
-    id: "mobil",
-    label: "Kredit Mobil",
+    id: "kendaraan",
+    label: "Kendaraan Bermotor",
+    shortLabel: "Kendaraan",
     icon: Car,
-    priceLabel: "Harga Mobil",
-    pricePlaceholder: "Contoh: 200.000.000",
-    defaultPrice: 200000000,
+    hasDownPayment: true,
+    priceLabel: "Harga Kendaraan",
+    pricePlaceholder: "Contoh: 150.000.000",
+    adminFeeLabel: "Biaya Admin",
+    upfrontLabel: "Total DP + Biaya",
+    defaultPrice: 150000000,
     defaultDP: 20,
-    defaultRate: 5,
-    defaultTenorMonths: 48,
+    defaultRate: 6,
+    defaultTenorMonths: 36,
     defaultAdminFee: 500000,
     defaultInsuranceFee: 0,
     tenorOptions: [
       { value: 12, label: "1 Tahun (12 Bulan)" },
+      { value: 18, label: "1,5 Tahun (18 Bulan)" },
       { value: 24, label: "2 Tahun (24 Bulan)" },
+      { value: 30, label: "2,5 Tahun (30 Bulan)" },
       { value: 36, label: "3 Tahun (36 Bulan)" },
       { value: 48, label: "4 Tahun (48 Bulan)" },
       { value: 60, label: "5 Tahun (60 Bulan)" },
@@ -53,38 +63,46 @@ export const TAB_CONFIGS: TabConfig[] = [
     accentBorder: "border-sky-200",
   },
   {
-    id: "motor",
-    label: "Kredit Motor",
-    icon: Bike,
-    priceLabel: "Harga Motor",
-    pricePlaceholder: "Contoh: 25.000.000",
-    defaultPrice: 25000000,
-    defaultDP: 25,
-    defaultRate: 8,
-    defaultTenorMonths: 24,
-    defaultAdminFee: 250000,
+    id: "multiguna",
+    label: "Kredit Multiguna",
+    shortLabel: "Multiguna",
+    icon: Wallet,
+    hasDownPayment: false,
+    priceLabel: "Jumlah Pinjaman",
+    pricePlaceholder: "Contoh: 50.000.000",
+    adminFeeLabel: "Biaya Admin / Provisi",
+    upfrontLabel: "Total Biaya di Muka",
+    defaultPrice: 50000000,
+    defaultDP: 0,
+    defaultRate: 12,
+    defaultTenorMonths: 36,
+    defaultAdminFee: 1000000,
     defaultInsuranceFee: 0,
     tenorOptions: [
       { value: 12, label: "1 Tahun (12 Bulan)" },
-      { value: 18, label: "1,5 Tahun (18 Bulan)" },
       { value: 24, label: "2 Tahun (24 Bulan)" },
-      { value: 30, label: "2,5 Tahun (30 Bulan)" },
       { value: 36, label: "3 Tahun (36 Bulan)" },
+      { value: 48, label: "4 Tahun (48 Bulan)" },
+      { value: 60, label: "5 Tahun (60 Bulan)" },
     ],
-    accentFrom: "from-emerald-500",
-    accentTo: "to-teal-600",
-    accentRing: "ring-emerald-500/30",
-    accentText: "text-emerald-600",
-    accentSoft: "bg-emerald-50",
-    accentSoftText: "text-emerald-700",
-    accentBorder: "border-emerald-200",
+    accentFrom: "from-violet-500",
+    accentTo: "to-purple-600",
+    accentRing: "ring-violet-500/30",
+    accentText: "text-violet-600",
+    accentSoft: "bg-violet-50",
+    accentSoftText: "text-violet-700",
+    accentBorder: "border-violet-200",
   },
   {
     id: "kpr",
     label: "Kredit KPR",
+    shortLabel: "KPR",
     icon: Home,
+    hasDownPayment: true,
     priceLabel: "Harga Properti",
     pricePlaceholder: "Contoh: 700.000.000",
+    adminFeeLabel: "Biaya Admin",
+    upfrontLabel: "Total DP + Biaya",
     defaultPrice: 700000000,
     defaultDP: 20,
     defaultRate: 6,
