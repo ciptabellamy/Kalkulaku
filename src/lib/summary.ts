@@ -1,4 +1,4 @@
-import { formatRupiah } from "@/lib/format";
+import { formatNumber, formatRupiah } from "@/lib/format";
 import type { LoanResult, AmortizationRow } from "@/lib/calc";
 import type { TabConfig } from "@/lib/tabs";
 
@@ -12,6 +12,7 @@ export interface SummaryData {
   tenorMonths: number;
   adminFee: number;
   insuranceFee: number;
+  floatingSource?: string;
 }
 
 export const SITE_NAME = "Kalkulaku";
@@ -36,13 +37,19 @@ export interface SummaryLine {
 }
 
 export const buildSummaryLines = (data: SummaryData): SummaryLine[] => {
-  const { config, result, method, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee } = data;
+  const { config, result, method, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee, floatingSource } = data;
   const primaryMonthly = getPrimaryMonthly(result, method);
   const primaryInterest = getPrimaryInterest(result, method);
   const primaryTotal = getPrimaryTotal(result, method);
   const totalPaymentPlusDP = primaryTotal + result.totalDownPayment;
   const totalFeesAndInsurance = adminFee + insuranceFee;
   const hasDP = config.hasDownPayment;
+  const floating = result.floating;
+  const fixedText = floating
+    ? floating.fixedMonths % 12 === 0
+      ? `${floating.fixedMonths / 12} tahun`
+      : `${floating.fixedMonths} bulan`
+    : "";
 
   return [
     { label: "Jenis Kredit", value: config.label },
@@ -55,14 +62,23 @@ export const buildSummaryLines = (data: SummaryData): SummaryLine[] => {
     { label: "Total Biaya & Asuransi", value: formatRupiah(totalFeesAndInsurance) },
     { label: config.upfrontLabel, value: formatRupiah(result.totalDownPayment) },
     { label: "Pokok Pinjaman", value: formatRupiah(result.principal) },
-    { label: "Suku Bunga", value: `${interestRate}% / thn` },
+    { label: config.hasFloating ? "Bunga Fixed" : "Suku Bunga", value: `${interestRate}% / thn` },
     { label: "Tenor", value: `${tenorMonths} bulan (${Math.floor(tenorMonths / 12)} tahun${tenorMonths % 12 ? " " + (tenorMonths % 12) + " bulan" : ""})` },
     { label: "Metode Bunga", value: method === "anuitas" ? "Anuitas" : "Flat" },
-    { label: "Cicilan / Bulan", value: formatRupiah(primaryMonthly) },
+    { label: floating ? "Cicilan / Bulan (Masa Fixed)" : "Cicilan / Bulan", value: formatRupiah(primaryMonthly) },
+    ...(floating
+      ? [
+          { label: "Masa Bunga Fixed", value: fixedText },
+          { label: "Bunga Floating (estimasi)", value: `${formatNumber(floating.floatingRate)}% / thn` },
+          ...(floatingSource ? [{ label: "Dasar Bunga Floating", value: floatingSource }] : []),
+          { label: "Cicilan Setelah Masa Fixed (estimasi)", value: formatRupiah(floating.monthlyAfterFixed) },
+        ]
+      : []),
     { label: "Total Bunga", value: formatRupiah(primaryInterest) },
     { label: "Total Pembayaran", value: formatRupiah(primaryTotal) },
     { label: hasDP ? "Total Pembayaran + DP" : "Total Pembayaran + Biaya di Muka", value: formatRupiah(totalPaymentPlusDP) },
     { label: "Min. Penghasilan Bersih", value: formatRupiah(result.minIncome) },
+    ...(floating ? [{ label: "Catatan Masa Floating", value: "Estimasi, dapat berubah" }] : []),
   ];
 };
 
@@ -72,6 +88,9 @@ export const buildCopyText = (data: SummaryData): string => {
   return (
     `=== Ringkasan Simulasi ${data.config.label} ===\n` +
     `${body}\n` +
+    (data.result.floating
+      ? "Catatan: Cicilan setelah masa fixed adalah estimasi dan dapat berubah mengikuti suku bunga pasar.\n"
+      : "") +
     `================================\n` +
     `${SITE_NAME} — ${SITE_TAGLINE}\n` +
     `${SITE_URL}`
