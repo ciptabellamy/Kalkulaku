@@ -37,7 +37,7 @@ export default function TabBar({ active, onChange }: TabBarProps) {
               {tab.label}
             </span>
             <span className="whitespace-nowrap xs:hidden sm:hidden">
-              {tab.label.replace("Kredit ", "")}
+              {tab.shortLabel}
             </span>
           </button>
         );
