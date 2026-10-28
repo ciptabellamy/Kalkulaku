@@ -21,8 +21,8 @@ import TabBar from "@/components/TabBar";
 import BiRateBanner from "@/components/BiRateBanner";
 import FinancialHealth from "@/components/FinancialHealth";
 import { calculateLoan } from "@/lib/calc";
-import { formatRupiah, formatRupiahInput, parseRupiahInput } from "@/lib/format";
-import { TAB_CONFIGS, type CreditType } from "@/lib/tabs";
+import { formatNumber, formatRupiah, formatRupiahInput, parseRupiahInput } from "@/lib/format";
+import { KPR_FLOATING_SPREAD, TAB_CONFIGS, type CreditType } from "@/lib/tabs";
 
 const getConfig = (id: CreditType) => TAB_CONFIGS.find((tab) => tab.id === id) ?? TAB_CONFIGS[0];
 
@@ -39,12 +39,36 @@ function App() {
   const [method, setMethod] = useState<"flat" | "anuitas">("anuitas");
   const [showFees, setShowFees] = useState(false);
   const [biRate, setBiRate] = useState<number>(6.5);
+  const [biPolicyRate, setBiPolicyRate] = useState<number>(5.75);
+  const [fixedYears, setFixedYears] = useState(config.defaultFixedYears);
+  const [floatingInput, setFloatingInput] = useState("");
 
   const effectiveDP = config.hasDownPayment ? downPayment : 0;
 
+  // KPR: bunga fixed beberapa tahun, lalu bunga floating.
+  // Bila bunga floating tidak diisi: BI-Rate terbaru + spread.
+  const autoFloatingRate = biPolicyRate + KPR_FLOATING_SPREAD;
+  const floatingParsed = floatingInput.trim() === "" ? NaN : Number(floatingInput.replace(",", "."));
+  const useAutoFloating = !Number.isFinite(floatingParsed);
+  const floatingRate = useAutoFloating ? autoFloatingRate : Math.min(100, Math.max(0, floatingParsed));
+  const fixedMonths = Math.round(Math.min(Math.max(fixedYears, 1), tenorMonths / 12) * 12);
+  const floatingSource = useAutoFloating
+    ? `BI-Rate ${formatNumber(biPolicyRate)}% + spread ${formatNumber(KPR_FLOATING_SPREAD)}%`
+    : "Input pengguna";
+
   const result = useMemo(
-    () => calculateLoan({ price, downPaymentPercent: effectiveDP, interestRate, tenorMonths, adminFee, insuranceFee }),
-    [price, effectiveDP, interestRate, tenorMonths, adminFee, insuranceFee],
+    () =>
+      calculateLoan({
+        price,
+        downPaymentPercent: effectiveDP,
+        interestRate,
+        tenorMonths,
+        adminFee,
+        insuranceFee,
+        fixedPeriodMonths: config.hasFloating ? fixedMonths : undefined,
+        floatingRate: config.hasFloating ? floatingRate : undefined,
+      }),
+    [price, effectiveDP, interestRate, tenorMonths, adminFee, insuranceFee, config.hasFloating, fixedMonths, floatingRate],
   );
 
   const switchType = (type: CreditType) => {
@@ -56,6 +80,9 @@ function App() {
     setTenorMonths(next.defaultTenorMonths);
     setAdminFee(next.defaultAdminFee);
     setInsuranceFee(next.defaultInsuranceFee);
+    setFixedYears(next.defaultFixedYears);
+    setFloatingInput("");
+    if (!next.allowFlat) setMethod("anuitas");
   };
 
   const toggleMethod = () => setMethod((prev) => (prev === "flat" ? "anuitas" : "flat"));
@@ -88,7 +115,10 @@ function App() {
 
       <main className="relative mx-auto max-w-6xl px-5 pb-14 pt-9 sm:px-8 sm:pt-12">
         {/* 1. BI Rate Banner */}
-        <BiRateBanner onUseRate={(rate) => setInterestRate(rate)} onDataLoaded={(d) => setBiRate(d.lending_facility)} />
+        <BiRateBanner onUseRate={(rate) => setInterestRate(rate)} onDataLoaded={(d) => {
+            setBiRate(d.lending_facility);
+            setBiPolicyRate(d.bi_rate);
+          }} />
 
         {/* Hero */}
         <div className="mb-8 mt-10 max-w-2xl sm:mb-10">
@@ -141,7 +171,7 @@ function App() {
                 </Field>
                 )}
 
-                <Field label="Suku bunga per tahun" hint="Estimasi" suffix="% / thn">
+                <Field label={config.rateLabel} hint="Estimasi" suffix="% / thn">
                   <input
                     type="number"
                     min="0"
@@ -160,6 +190,57 @@ function App() {
                   </button>
                 </Field>
               </div>
+
+              {config.hasFloating && (
+                <div className="space-y-4">
+                  <div className={`flex gap-2.5 rounded-2xl border px-4 py-3.5 text-xs leading-5 ${config.accentBorder} ${config.accentSoft} ${config.accentSoftText}`}>
+                    <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                    <p>Bunga KPR umumnya fixed di tahun-tahun awal, lalu mengikuti suku bunga pasar (floating). Cicilan setelah masa fixed bisa berubah.</p>
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Field label="Lama masa bunga fixed" hint="Dalam tahun" suffix="tahun">
+                      <input
+                        type="number"
+                        min="1"
+                        max={tenorMonths / 12}
+                        step="1"
+                        value={fixedYears}
+                        onChange={(event) => setFixedYears(Math.max(0, Number(event.target.value)))}
+                        className="h-[52px] w-full rounded-xl border border-slate-200 bg-slate-50 pl-4 pr-[4.5rem] text-sm font-semibold text-slate-800 outline-none transition-all focus:border-sky-400 focus:bg-white focus:ring-4 focus:ring-sky-100"
+                      />
+                    </Field>
+
+                    <Field label="Bunga floating setelah masa fixed" hint="Opsional" suffix="% / thn">
+                      <input
+                        inputMode="decimal"
+                        value={floatingInput}
+                        onChange={(event) => setFloatingInput(event.target.value.replace(/[^0-9.,]/g, ""))}
+                        placeholder={`Otomatis ${formatNumber(autoFloatingRate)}`}
+                        className="h-[52px] w-full rounded-xl border border-slate-200 bg-slate-50 pl-4 pr-[4.5rem] text-sm font-semibold text-slate-800 outline-none transition-all placeholder:font-medium placeholder:text-slate-300 focus:border-sky-400 focus:bg-white focus:ring-4 focus:ring-sky-100"
+                      />
+                      {!useAutoFloating && (
+                        <button
+                          onClick={() => setFloatingInput("")}
+                          className="mt-2 rounded-lg bg-sky-50 px-2.5 py-1.5 text-xs font-semibold text-sky-600 transition-colors hover:bg-sky-100"
+                        >
+                          Pakai estimasi otomatis ({formatNumber(autoFloatingRate)}%)
+                        </button>
+                      )}
+                    </Field>
+                  </div>
+
+                  {fixedYears * 12 >= tenorMonths && (
+                    <p className="text-xs leading-5 text-slate-500">
+                      Masa fixed sama dengan atau melebihi tenor, jadi seluruh cicilan memakai bunga fixed.
+                    </p>
+                  )}
+
+                  <p className="text-xs leading-5 text-slate-500">
+                    Jika bunga floating dikosongkan, simulasi memakai estimasi BI-Rate terbaru ({formatNumber(biPolicyRate)}%) ditambah spread {formatNumber(KPR_FLOATING_SPREAD)}%, yaitu {formatNumber(autoFloatingRate)}% per tahun. Ini hanya asumsi untuk simulasi. Bunga floating sebenarnya ditetapkan bank dan bisa berbeda.
+                  </p>
+                </div>
+              )}
 
               <Field label="Tenor / durasi pinjaman" hint="Pilih durasi">
                 <div className="relative">
@@ -218,7 +299,7 @@ function App() {
           </section>
 
           {/* 3. Result Card */}
-          <ResultCard result={result} config={config} method={method} onToggleMethod={toggleMethod} price={price} downPaymentPercent={effectiveDP} interestRate={interestRate} tenorMonths={tenorMonths} adminFee={adminFee} insuranceFee={insuranceFee} />
+          <ResultCard result={result} config={config} method={method} onToggleMethod={toggleMethod} price={price} downPaymentPercent={effectiveDP} interestRate={interestRate} tenorMonths={tenorMonths} adminFee={adminFee} insuranceFee={insuranceFee} floatingSource={floatingSource} />
         </div>
 
         {/* 4. Financial Health Education Section */}
