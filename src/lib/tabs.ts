@@ -1,6 +1,6 @@
-import { Car, Wallet, Home, type LucideIcon } from "lucide-react";
+import { Car, Wallet, Home, RefreshCw, type LucideIcon } from "lucide-react";
 
-export type CreditType = "kendaraan" | "multiguna" | "kpr";
+export type CreditType = "kendaraan" | "multiguna" | "kpr" | "refinancing";
 
 // Asumsi spread KPR floating di atas BI-Rate (dalam persen)
 export const KPR_FLOATING_SPREAD = 6.25;
@@ -142,5 +142,34 @@ export const TAB_CONFIGS: TabConfig[] = [
     accentSoft: "bg-amber-50",
     accentSoftText: "text-amber-700",
     accentBorder: "border-amber-200",
+  },
+  {
+    id: "refinancing",
+    label: "Refinancing",
+    shortLabel: "Refinancing",
+    allowFlat: true,
+    hasFloating: false,
+    rateLabel: "Suku bunga per tahun",
+    defaultFixedYears: 0,
+    icon: RefreshCw,
+    hasDownPayment: false,
+    priceLabel: "Sisa Pokok",
+    pricePlaceholder: "Contoh: 75.000.000",
+    adminFeeLabel: "Biaya Admin",
+    upfrontLabel: "Total Biaya",
+    defaultPrice: 0,
+    defaultDP: 0,
+    defaultRate: 0,
+    defaultTenorMonths: 12,
+    defaultAdminFee: 0,
+    defaultInsuranceFee: 0,
+    tenorOptions: [{ value: 12, label: "12 Bulan" }],
+    accentFrom: "from-emerald-500",
+    accentTo: "to-teal-600",
+    accentRing: "ring-emerald-500/30",
+    accentText: "text-emerald-600",
+    accentSoft: "bg-emerald-50",
+    accentSoftText: "text-emerald-700",
+    accentBorder: "border-emerald-200",
   },
 ];
