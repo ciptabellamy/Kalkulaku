@@ -43,7 +43,7 @@ export interface LoanResult {
 }
 
 // Anuitas: M = P * r / (1 - (1+r)^-n)
-const annuityPayment = (principal: number, monthlyRate: number, months: number): number => {
+export const annuityPayment = (principal: number, monthlyRate: number, months: number): number => {
   if (months <= 0) return 0;
   if (monthlyRate === 0) return principal / months;
   const factor = Math.pow(1 + monthlyRate, months);
