@@ -19,6 +19,7 @@ import Field from "@/components/Field";
 import ResultCard from "@/components/ResultCard";
 import TabBar from "@/components/TabBar";
 import BiRateBanner from "@/components/BiRateBanner";
+import RefinanceCalculator from "@/components/RefinanceCalculator";
 import FinancialHealth from "@/components/FinancialHealth";
 import { calculateLoan } from "@/lib/calc";
 import { formatNumber, formatRupiah, formatRupiahInput, parseRupiahInput } from "@/lib/format";
@@ -103,7 +104,7 @@ function App() {
             </div>
             <div>
               <p className="text-base font-bold tracking-tight text-slate-950 sm:text-lg">Kalku<span className="text-sky-600">laku</span></p>
-              <p className="hidden text-[11px] font-medium tracking-wide text-slate-400 sm:block">Kalkulator Simulasi Kredit Kendaraan, Multiguna & KPR Terpercaya</p>
+              <p className="hidden text-[11px] font-medium tracking-wide text-slate-400 sm:block">Kalkulator Simulasi Kredit Kendaraan, Multiguna, KPR & Refinancing</p>
             </div>
           </div>
           <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 shadow-sm sm:flex">
@@ -115,20 +116,28 @@ function App() {
 
       <main className="relative mx-auto max-w-6xl px-5 pb-14 pt-9 sm:px-8 sm:pt-12">
         {/* 1. BI Rate Banner */}
+        <div className={activeType === "refinancing" ? "hidden" : ""}>
         <BiRateBanner onUseRate={(rate) => setInterestRate(rate)} onDataLoaded={(d) => {
             setBiRate(d.lending_facility);
             setBiPolicyRate(d.bi_rate);
           }} />
+        </div>
 
         {/* Hero */}
         <div className="mb-8 mt-10 max-w-2xl sm:mb-10">
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-sky-600">Simulasi kredit online</p>
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">Kalkulaku – Kalkulator Simulasi Kredit Kendaraan Bermotor, Multiguna & KPR Terpercaya</h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">Hitung estimasi angsuran bulanan, DP, bunga kredit kendaraan bermotor, multiguna, dan KPR, serta analisis kesehatan finansial secara akurat tanpa ribet.</p>
+          <h1 className="text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">Kalkulaku – Kalkulator Simulasi Kredit Kendaraan Bermotor, Multiguna, KPR & Refinancing</h1>
+          <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">Hitung estimasi angsuran bulanan, DP, bunga kredit kendaraan bermotor, multiguna, dan KPR, simulasi refinancing, serta analisis kesehatan finansial secara akurat tanpa ribet.</p>
         </div>
 
         <TabBar active={activeType} onChange={switchType} />
 
+        {activeType === "refinancing" ? (
+          <div className="mt-5">
+            <RefinanceCalculator config={config} />
+          </div>
+        ) : (
+        <>
         <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.9fr)] lg:gap-7">
           {/* 2. Form Input */}
           <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/50 sm:p-7">
@@ -306,6 +315,8 @@ function App() {
         <div className="mt-7">
           <FinancialHealth minIncome={result.minIncome} monthlyPayment={primaryMonthly} />
         </div>
+        </>
+        )}
 
       </main>
     </div>
