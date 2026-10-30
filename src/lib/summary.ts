@@ -16,7 +16,7 @@ export interface SummaryData {
 }
 
 export const SITE_NAME = "Kalkulaku";
-export const SITE_TAGLINE = "Kalkulator Simulasi Kredit Kendaraan, Multiguna & KPR Terpercaya";
+export const SITE_TAGLINE = "Kalkulator Simulasi Kredit Kendaraan, Multiguna, KPR & Refinancing";
 export const SITE_URL = "kalkulaku.id";
 
 export const getPrimaryMonthly = (result: LoanResult, method: "flat" | "anuitas") =>
