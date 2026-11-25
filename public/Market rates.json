@@ -1,0 +1,22 @@
+{
+  "updatedAt": "2026-11-25",
+  "biRate": {
+    "value": 6.0,
+    "asOf": "2026-11-18",
+    "source": "Bank Indonesia, RDG 17-18 November 2026"
+  },
+  "floatingSpread": 6.25,
+  "rates": {
+    "kendaraan": { "average": 10, "low": 5, "high": 15, "basis": "efektif per tahun" },
+    "multiguna": { "average": 15, "low": 10, "high": 24, "basis": "efektif per tahun" },
+    "kpr": { "average": 5, "low": 2.6, "high": 9, "basis": "bunga fixed di tahun-tahun awal" }
+  },
+  "sources": [
+    "BI: rata-rata tertimbang bunga kredit bank 8,9% (Okt 2026); BPS/BI: bunga kredit konsumsi bank umum 10,69% (Jul 2026)",
+    "KKB bank (BCA, Agu 2026): mobil baru 2,7-4,5% flat, mobil bekas 6,25-7,00% flat. Setara efektif sekitar 5-8% (baru) dan 11-13% (bekas)",
+    "Multiguna BPKB mobil: sekitar 0,66-0,99% per bulan (flat), setara efektif sekitar 14-21%. KTA bank sekitar 10-23% per tahun",
+    "KPR: SBDK KPR bank 8,5-9,7% (Apr-Okt 2026). Promo fixed 1-5 tahun sekitar 2,6-7% (Mandiri, CIMB Niaga, BTN, BRI). Floating mengikuti BI-Rate dan kebijakan bank",
+    "BI-Rate naik 25 bps menjadi 6,00% pada RDG 17-18 November 2026 (Lending Facility 6,75%, Deposit Facility 5,25%)",
+    "Nilai 'average' adalah estimasi gabungan dari bunga yang dipublikasikan, bukan angka resmi per produk. Perbarui tiap bulan."
+  ]
+}
