@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeftRight,
   BadgePercent,
@@ -18,12 +18,12 @@ interface BiRateData {
 import Field from "@/components/Field";
 import ResultCard from "@/components/ResultCard";
 import TabBar from "@/components/TabBar";
-import BiRateBanner from "@/components/BiRateBanner";
 import RefinanceCalculator from "@/components/RefinanceCalculator";
 import FinancialHealth from "@/components/FinancialHealth";
 import { calculateLoan } from "@/lib/calc";
 import { formatNumber, formatRupiah, formatRupiahInput, parseRupiahInput } from "@/lib/format";
-import { KPR_FLOATING_SPREAD, TAB_CONFIGS, type CreditType } from "@/lib/tabs";
+import { formatDateId, useMarketRates } from "@/lib/marketRates";
+import { TAB_CONFIGS, type CreditType } from "@/lib/tabs";
 
 const getConfig = (id: CreditType) => TAB_CONFIGS.find((tab) => tab.id === id) ?? TAB_CONFIGS[0];
 
@@ -39,22 +39,30 @@ function App() {
   const [insuranceFee, setInsuranceFee] = useState(config.defaultInsuranceFee);
   const [method, setMethod] = useState<"flat" | "anuitas">("anuitas");
   const [showFees, setShowFees] = useState(false);
-  const [biRate, setBiRate] = useState<number>(6.5);
-  const [biPolicyRate, setBiPolicyRate] = useState<number>(5.75);
+  const [rateEdited, setRateEdited] = useState(false);
+  const market = useMarketRates();
   const [fixedYears, setFixedYears] = useState(config.defaultFixedYears);
   const [floatingInput, setFloatingInput] = useState("");
+
+  useEffect(() => {
+    if (rateEdited || activeType === "refinancing") return;
+    setInterestRate(market.rates[activeType].average);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [market]);
+
+  const marketRate = activeType === "refinancing" ? null : market.rates[activeType];
 
   const effectiveDP = config.hasDownPayment ? downPayment : 0;
 
   // KPR: bunga fixed beberapa tahun, lalu bunga floating.
   // Bila bunga floating tidak diisi: BI-Rate terbaru + spread.
-  const autoFloatingRate = biPolicyRate + KPR_FLOATING_SPREAD;
+  const autoFloatingRate = market.biRate.value + market.floatingSpread;
   const floatingParsed = floatingInput.trim() === "" ? NaN : Number(floatingInput.replace(",", "."));
   const useAutoFloating = !Number.isFinite(floatingParsed);
   const floatingRate = useAutoFloating ? autoFloatingRate : Math.min(100, Math.max(0, floatingParsed));
   const fixedMonths = Math.round(Math.min(Math.max(fixedYears, 1), tenorMonths / 12) * 12);
   const floatingSource = useAutoFloating
-    ? `BI-Rate ${formatNumber(biPolicyRate)}% + spread ${formatNumber(KPR_FLOATING_SPREAD)}%`
+    ? `BI-Rate ${formatNumber(market.biRate.value)}% + spread ${formatNumber(market.floatingSpread)}%`
     : "Input pengguna";
 
   const result = useMemo(
@@ -77,7 +85,8 @@ function App() {
     setActiveType(type);
     setPrice(next.defaultPrice);
     setDownPayment(next.defaultDP);
-    setInterestRate(next.defaultRate);
+    setInterestRate(type === "refinancing" ? next.defaultRate : market.rates[type].average);
+    setRateEdited(false);
     setTenorMonths(next.defaultTenorMonths);
     setAdminFee(next.defaultAdminFee);
     setInsuranceFee(next.defaultInsuranceFee);
@@ -115,16 +124,8 @@ function App() {
       </header>
 
       <main className="relative mx-auto max-w-6xl px-5 pb-14 pt-9 sm:px-8 sm:pt-12">
-        {/* 1. BI Rate Banner */}
-        <div className={activeType === "refinancing" ? "hidden" : ""}>
-        <BiRateBanner onUseRate={(rate) => setInterestRate(rate)} onDataLoaded={(d) => {
-            setBiRate(d.lending_facility);
-            setBiPolicyRate(d.bi_rate);
-          }} />
-        </div>
-
         {/* Hero */}
-        <div className="mb-8 mt-10 max-w-2xl sm:mb-10">
+        <div className="mb-8 max-w-2xl sm:mb-10">
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-sky-600">Simulasi kredit online</p>
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">Kalkulaku – Kalkulator Simulasi Kredit Kendaraan Bermotor, Multiguna, KPR & Refinancing</h1>
           <p className="mt-4 max-w-xl text-sm leading-6 text-slate-500 sm:text-base">Hitung estimasi angsuran bulanan, DP, bunga kredit kendaraan bermotor, multiguna, dan KPR, simulasi refinancing, serta analisis kesehatan finansial secara akurat tanpa ribet.</p>
@@ -187,16 +188,29 @@ function App() {
                     max="100"
                     step="0.1"
                     value={interestRate}
-                    onChange={(event) => setInterestRate(Math.min(100, Math.max(0, Number(event.target.value))))}
+                    onChange={(event) => {
+                      setRateEdited(true);
+                      setInterestRate(Math.min(100, Math.max(0, Number(event.target.value))));
+                    }}
                     className="h-[52px] w-full rounded-xl border border-slate-200 bg-slate-50 pl-4 pr-[4.5rem] text-sm font-semibold text-slate-800 outline-none transition-all focus:border-sky-400 focus:bg-white focus:ring-4 focus:ring-sky-100"
                   />
-                  <button
-                    onClick={() => setInterestRate(biRate)}
-                    className="mt-2 flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1.5 text-xs font-semibold text-sky-600 transition-colors hover:bg-sky-100"
-                  >
-                    <Landmark className="h-3 w-3" />
-                    Gunakan Bunga Acuan BI ({biRate.toFixed(2)}%)
-                  </button>
+                  {marketRate && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setRateEdited(false);
+                          setInterestRate(marketRate.average);
+                        }}
+                        className="mt-2 flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1.5 text-xs font-semibold text-sky-600 transition-colors hover:bg-sky-100"
+                      >
+                        <Landmark className="h-3 w-3" />
+                        Gunakan rata-rata pasar ({formatNumber(marketRate.average, 1)}%)
+                      </button>
+                      <p className="mt-1.5 text-[11px] leading-4 text-slate-400">
+                        Kisaran {formatNumber(marketRate.low, 1)}–{formatNumber(marketRate.high, 1)}% · {marketRate.basis} · estimasi per {formatDateId(market.updatedAt)}
+                      </p>
+                    </>
+                  )}
                 </Field>
               </div>
 
@@ -246,7 +260,7 @@ function App() {
                   )}
 
                   <p className="text-xs leading-5 text-slate-500">
-                    Jika bunga floating dikosongkan, simulasi memakai estimasi BI-Rate terbaru ({formatNumber(biPolicyRate)}%) ditambah spread {formatNumber(KPR_FLOATING_SPREAD)}%, yaitu {formatNumber(autoFloatingRate)}% per tahun. Ini hanya asumsi untuk simulasi. Bunga floating sebenarnya ditetapkan bank dan bisa berbeda.
+                    Jika bunga floating dikosongkan, simulasi memakai estimasi BI-Rate terbaru ({formatNumber(market.biRate.value)}%, per {formatDateId(market.biRate.asOf)}) ditambah spread {formatNumber(market.floatingSpread)}%, yaitu {formatNumber(autoFloatingRate)}% per tahun. Ini hanya asumsi untuk simulasi. Bunga floating sebenarnya ditetapkan bank dan bisa berbeda.
                   </p>
                 </div>
               )}
