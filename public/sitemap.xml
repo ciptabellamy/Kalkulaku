@@ -2,10 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://kalkulaku.id/</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>2026-11-27</lastmod>
     <priority>1.0</priority>
   </url>
-  <!-- Tambahkan tiap halaman kalkulator baru di sini, misalnya:
-  <url><loc>https://kalkulaku.id/kalkulator-kredit-motor</loc></url>
-  -->
+  <url>
+    <loc>https://kalkulaku.id/tentang.html</loc>
+    <lastmod>2026-11-27</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://kalkulaku.id/privasi.html</loc>
+    <lastmod>2026-11-27</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <!-- Tambahkan tiap halaman baru di sini -->
 </urlset>
