@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { AlertTriangle, Check, Copy, Info } from "lucide-react";
 import Field from "@/components/Field";
+import { trackEvent } from "@/lib/analytics";
 import { formatNumber, formatRupiah, formatRupiahInput, parseRupiahInput } from "@/lib/format";
 import { buildRefinanceCopyText, calculateRefinance, type InterestType } from "@/lib/refinance";
 import { SITE_NAME, SITE_URL } from "@/lib/summary";
@@ -111,6 +112,7 @@ export default function RefinanceCalculator({ config }: RefinanceCalculatorProps
 
   const handleCopy = () => {
     const text = buildRefinanceCopyText(input, result, kindLabel, SITE_NAME, SITE_URL);
+    trackEvent("copy_summary", { tab: "refinancing" });
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
