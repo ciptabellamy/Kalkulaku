@@ -22,6 +22,9 @@ import RefinanceCalculator from "@/components/RefinanceCalculator";
 import FinancialHealth from "@/components/FinancialHealth";
 import { calculateLoan } from "@/lib/calc";
 import { formatNumber, formatRupiah, formatRupiahInput, parseRupiahInput } from "@/lib/format";
+import FaqSection from "@/components/FaqSection";
+import Footer from "@/components/Footer";
+import { trackEvent } from "@/lib/analytics";
 import { formatDateId, useMarketRates } from "@/lib/marketRates";
 import { TAB_CONFIGS, type CreditType } from "@/lib/tabs";
 
@@ -82,6 +85,7 @@ function App() {
 
   const switchType = (type: CreditType) => {
     const next = getConfig(type);
+    trackEvent("select_tab", { tab: type });
     setActiveType(type);
     setPrice(next.defaultPrice);
     setDownPayment(next.defaultDP);
@@ -198,6 +202,7 @@ function App() {
                     <>
                       <button
                         onClick={() => {
+                          trackEvent("use_market_rate", { tab: activeType });
                           setRateEdited(false);
                           setInterestRate(marketRate.average);
                         }}
@@ -332,7 +337,9 @@ function App() {
         </>
         )}
 
+        <FaqSection />
       </main>
+      <Footer />
     </div>
   );
 }
