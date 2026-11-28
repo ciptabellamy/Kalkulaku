@@ -17,7 +17,7 @@ import type { LoanResult, AmortizationRow } from "@/lib/calc";
 import type { TabConfig } from "@/lib/tabs";
 import AmortizationTable from "@/components/AmortizationTable";
 import { buildCopyText, type SummaryData } from "@/lib/summary";
-import { generatePDF } from "@/lib/pdf";
+import { trackEvent } from "@/lib/analytics";
 
 export type CalcMethod = "flat" | "anuitas";
 
@@ -39,6 +39,7 @@ interface ResultCardProps {
 
 export default function ResultCard({ result, config, method, onToggleMethod, price, downPaymentPercent, interestRate, tenorMonths, adminFee, insuranceFee, floatingSource }: ResultCardProps) {
   const [copied, setCopied] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const isAnuitas = method === "anuitas";
   const primaryMonthly = isAnuitas ? result.monthlyAnnuity : result.monthlyFlat;
   const primaryTotal = isAnuitas ? result.totalPaymentAnnuity : result.totalPaymentFlat;
@@ -51,14 +52,26 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
 
   const handleCopy = () => {
     const text = buildCopyText(summaryData);
+    trackEvent("copy_summary", { tab: config.id });
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   };
 
-  const handleDownloadPDF = () => {
-    generatePDF(summaryData);
+  // Library PDF cukup besar, jadi baru dimuat saat tombol ditekan
+  const handleDownloadPDF = async () => {
+    if (pdfLoading) return;
+    setPdfLoading(true);
+    trackEvent("download_pdf", { tab: config.id });
+    try {
+      const { generatePDF } = await import("@/lib/pdf");
+      generatePDF(summaryData);
+    } catch (error) {
+      console.error("Gagal membuat PDF:", error);
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   return (
@@ -164,10 +177,11 @@ export default function ResultCard({ result, config, method, onToggleMethod, pri
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={handleDownloadPDF}
-              className="group flex flex-1 items-center justify-center gap-2.5 rounded-xl bg-slate-900 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-slate-300 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-800 active:translate-y-0"
+              disabled={pdfLoading}
+              className="group flex flex-1 items-center justify-center gap-2.5 rounded-xl bg-slate-900 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-slate-300 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-800 active:translate-y-0 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
             >
               <Download className="h-4 w-4 transition-transform group-hover:scale-110" />
-              Download PDF
+              {pdfLoading ? "Menyiapkan PDF..." : "Download PDF"}
             </button>
             <button
               onClick={handleCopy}
