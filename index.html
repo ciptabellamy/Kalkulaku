@@ -5,39 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f6f8fb" />
 
-  <!-- Title & description: unik, sesuai isi halaman -->
- <title>Kalkulator Kredit: Simulasi Cicilan Kendaraan, Multiguna, KPR | Kalkulaku</title>
-<meta name="description" content="Hitung simulasi cicilan kredit kendaraan bermotor, multiguna, dan KPR. Bandingkan bunga flat dan efektif, gratis, akurat, dan tanpa daftar." />
-  
+  <title>Kalkulator Kredit: Simulasi Cicilan Kendaraan, Multiguna, KPR | Kalkulaku</title>
+  <meta name="description" content="Hitung simulasi cicilan kredit kendaraan bermotor, multiguna, KPR, dan refinancing. Bandingkan bunga flat dan efektif. Gratis, akurat, tanpa daftar." />
   <link rel="canonical" href="https://kalkulaku.id/" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="author" content="Kalkulaku" />
 
-  <!-- Verifikasi Google Search Console (isi lalu hapus tanda komentar) -->
+  <!-- Verifikasi Google Search Console (jika memakai metode meta tag, isi lalu hapus tanda komentar) -->
   <!-- <meta name="google-site-verification" content="KODE_DARI_SEARCH_CONSOLE" /> -->
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Kalkulaku" />
   <meta property="og:locale" content="id_ID" />
   <meta property="og:url" content="https://kalkulaku.id/" />
   <meta property="og:title" content="Kalkulaku: Kalkulator & Simulasi Kredit" />
-  <meta property="og:description" content="Hitung cicilan kredit motor, mobil, KPR, dan pinjaman dengan bunga flat atau efektif. Gratis dan akurat." />
+  <meta property="og:description" content="Hitung cicilan kredit kendaraan, multiguna, KPR, dan refinancing dengan bunga flat atau efektif. Gratis dan akurat." />
   <meta property="og:image" content="https://kalkulaku.id/thumbnail.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Kalkulaku, kalkulator dan simulasi kredit" />
 
-  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Kalkulaku: Kalkulator & Simulasi Kredit" />
-  <meta name="twitter:description" content="Hitung cicilan kredit motor, mobil, KPR, dan pinjaman dengan bunga flat atau efektif." />
+  <meta name="twitter:description" content="Hitung cicilan kredit kendaraan, multiguna, KPR, dan refinancing dengan bunga flat atau efektif." />
   <meta name="twitter:image" content="https://kalkulaku.id/thumbnail.jpg" />
 
-  <!-- Icon: pakai path absolut agar tidak rusak di halaman bersarang -->
-  <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" href="/web-app-manifest-192x192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <!-- Structured data -->
+  <!-- Structured data. Bagian FAQPage harus sama dengan src/lib/faq.ts -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -57,8 +54,19 @@
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Web",
         "inLanguage": "id-ID",
-        "description": "Alat bantu hitung simulasi cicilan kredit motor, mobil, KPR, dan pinjaman tunai dengan bunga flat atau efektif.",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" }
+        "description": "Alat bantu hitung simulasi cicilan kredit kendaraan bermotor, multiguna, KPR, dan refinancing dengan bunga flat atau efektif.",
+        "featureList": [
+          "Kalkulator kredit kendaraan bermotor",
+          "Kalkulator kredit multiguna",
+          "Kalkulator KPR dengan bunga fixed dan floating",
+          "Simulasi refinancing kredit",
+          "Perbandingan bunga flat dan efektif"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "IDR"
+        }
       },
       {
         "@type": "FAQPage",
@@ -68,23 +76,71 @@
             "name": "Apa beda bunga flat dan bunga efektif?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Bunga flat dihitung dari pokok pinjaman awal dan nilainya tetap sepanjang tenor. Bunga efektif dihitung dari sisa pokok yang terus menurun, sehingga total bunganya umumnya lebih kecil pada angka bunga nominal yang sama."
+              "text": "Bunga flat dihitung dari pokok pinjaman awal dan nilainya sama setiap bulan sepanjang tenor. Bunga efektif (anuitas) dihitung dari sisa pokok yang terus menurun, sehingga untuk angka bunga yang sama total bunganya jauh lebih kecil. Karena itu bunga flat tidak bisa dibandingkan langsung dengan bunga efektif. Contohnya, pinjaman Rp100 juta selama 4 tahun dengan bunga flat 9% per tahun membayar total bunga Rp36 juta dan setara dengan bunga efektif sekitar 16% per tahun, sedangkan bunga efektif 9% hanya membayar total bunga sekitar Rp19,4 juta."
             }
           },
           {
             "@type": "Question",
-            "name": "Bagaimana cara menghitung cicilan kredit bunga flat?",
+            "name": "Bagaimana cara menghitung cicilan kredit dengan bunga flat?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Cicilan per bulan = (pokok pinjaman + pokok × bunga per tahun × lama pinjaman dalam tahun) ÷ jumlah bulan tenor."
+              "text": "Cicilan per bulan = (pokok pinjaman + pokok pinjaman × bunga per tahun × lama pinjaman dalam tahun) ÷ jumlah bulan tenor. Contoh: pinjaman Rp100 juta, bunga flat 9% per tahun, tenor 4 tahun, maka cicilannya (Rp100 juta + Rp100 juta × 9% × 4) ÷ 48 = Rp2.833.333 per bulan."
             }
           },
           {
             "@type": "Question",
-            "name": "Apakah hasil simulasi sama persis dengan hitungan bank atau leasing?",
+            "name": "Bagaimana cara menghitung cicilan dengan bunga efektif (anuitas)?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Hasil simulasi adalah perkiraan. Angka final bisa berbeda karena biaya administrasi, provisi, asuransi, dan kebijakan masing-masing lembaga pembiayaan."
+              "text": "Cicilan per bulan = P × r ÷ (1 − (1 + r)^−n), dengan P pokok pinjaman, r bunga per bulan (bunga tahunan ÷ 12), dan n jumlah bulan tenor. Cicilan tetap sama setiap bulan, tetapi porsi bunga mengecil dan porsi pokok membesar seiring waktu. Contoh: pinjaman Rp100 juta, bunga efektif 12% per tahun, tenor 4 tahun, cicilannya sekitar Rp2.633.384 per bulan."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Berapa DP minimal untuk kredit kendaraan bermotor?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Besar DP ditentukan oleh bank atau perusahaan pembiayaan dan kebijakan yang berlaku, tergantung jenis kendaraan, profil nasabah, dan promo yang berjalan. Pada kalkulator ini Anda bebas mengatur persentase DP untuk melihat pengaruhnya terhadap cicilan, lalu pastikan angka sebenarnya dengan lembaga pembiayaan."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apa itu bunga fixed dan floating pada KPR?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bunga fixed tetap selama periode tertentu, umumnya 1 sampai 5 tahun pertama, sehingga cicilan stabil. Setelah masa fixed berakhir, bunga beralih ke floating yang mengikuti suku bunga pasar dan kebijakan bank, sehingga cicilan bisa naik atau turun. Di tab KPR, Anda dapat mengatur lama masa fixed dan bunga floating setelahnya. Bila bunga floating dikosongkan, kalkulator memakai estimasi BI-Rate ditambah spread tertentu."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Kapan refinancing kredit menguntungkan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Refinancing menguntungkan bila penghematan bunga lebih besar daripada biaya yang timbul, yaitu pinalti pelunasan, selisih bunga flat dan efektif pada pinjaman lama, serta biaya admin atau provisi pinjaman baru. Bandingkan bunga dalam ukuran yang sama (bunga efektif setara) dan waspadai tenor baru yang lebih panjang, karena angsuran turun tetapi total bunga bisa naik. Tab Refinancing menghitung selisih tersebut untuk Anda."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Berapa rasio cicilan yang aman terhadap penghasilan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pedoman umum, total cicilan tidak lebih dari 30% penghasilan bersih bulanan. Kalkulator ini menampilkan perkiraan penghasilan minimal agar rasio cicilan tetap di 30%."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah hasil simulasi sama dengan hitungan bank atau leasing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hasil simulasi adalah estimasi. Angka resmi bisa berbeda karena biaya administrasi, provisi, asuransi, biaya fidusia, pembulatan, dan kebijakan masing-masing lembaga. Minta tabel angsuran resmi sebelum menandatangani perjanjian kredit."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Dari mana angka bunga rata-rata pasar di kalkulator?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Angka itu estimasi gabungan dari bunga yang dipublikasikan bank dan perusahaan pembiayaan, dikonversi ke bunga efektif bila perlu, dan diperbarui berkala. Ini bukan penawaran resmi dan bukan angka resmi per produk, jadi sesuaikan dengan penawaran yang Anda terima."
             }
           }
         ]
@@ -93,7 +149,7 @@
   }
   </script>
 
-  <!-- Analytics (ganti G-XXXXXXXXXX dengan ID GA4 Anda lalu hapus tanda komentar) -->
+  <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DJFQCLR2JL"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -101,31 +157,29 @@
     gtag('js', new Date());
     gtag('config', 'G-DJFQCLR2JL');
   </script>
-
-  <!-- Baris di bawah dibuat otomatis oleh Vite; jangan diubah manual jika memakai source index.html -->
-
 </head>
-     <script type="module" src="/src/main.tsx"></script>
 <body>
   <div id="root">
-    <!-- Konten cadangan agar crawler dan pengguna JS-mati tetap melihat isi.
-         Akan otomatis diganti React saat aplikasi termuat. -->
+    <!-- Konten cadangan untuk crawler dan pengguna tanpa JavaScript.
+         Otomatis diganti React saat aplikasi termuat. -->
     <main>
-      <h1>Kalkulator Kredit &amp; Simulasi Cicilan</h1>
+      <h1>Kalkulator Kredit dan Simulasi Cicilan</h1>
       <p>
-        Kalkulaku membantu Anda menghitung simulasi cicilan kredit motor, mobil, KPR,
-        dan pinjaman tunai. Pilih bunga flat atau efektif, atur uang muka dan tenor,
-        lalu lihat cicilan per bulan secara cepat dan akurat. Gratis dan tanpa daftar.
+        Kalkulaku membantu Anda menghitung simulasi cicilan kredit kendaraan bermotor, kredit multiguna,
+        KPR dengan bunga fixed lalu floating, dan refinancing. Bandingkan bunga flat dengan bunga efektif,
+        atur uang muka dan tenor, lalu lihat cicilan per bulan secara cepat dan akurat. Gratis dan tanpa daftar.
       </p>
       <ul>
-        <li>Simulasi kredit motor</li>
-        <li>Simulasi kredit mobil</li>
-        <li>Simulasi KPR</li>
-        <li>Simulasi pinjaman tunai</li>
+        <li>Simulasi kredit kendaraan bermotor</li>
+        <li>Simulasi kredit multiguna</li>
+        <li>Simulasi KPR dengan masa bunga fixed dan floating</li>
+        <li>Simulasi refinancing: bandingkan pinjaman lama dan baru</li>
         <li>Perbandingan bunga flat dan bunga efektif</li>
       </ul>
+      <p><a href="/tentang.html">Tentang Kalkulaku</a> · <a href="/privasi.html">Kebijakan Privasi</a></p>
     </main>
     <noscript>Aktifkan JavaScript untuk menggunakan kalkulator Kalkulaku.</noscript>
   </div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
