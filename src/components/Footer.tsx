@@ -11,7 +11,6 @@ export default function Footer() {
         <nav aria-label="Tautan footer" className="flex flex-wrap gap-x-6 gap-y-2 font-medium">
           <a href="/tentang.html" className="transition-colors hover:text-sky-600">Tentang</a>
           <a href="/privasi.html" className="transition-colors hover:text-sky-600">Kebijakan Privasi</a>
-          <a href="/tentang.html#kontak" className="transition-colors hover:text-sky-600">Kontak</a>
         </nav>
       </div>
       <p className="pb-6 text-center text-[11px] text-slate-400">© {new Date().getFullYear()} Kalkulaku</p>
